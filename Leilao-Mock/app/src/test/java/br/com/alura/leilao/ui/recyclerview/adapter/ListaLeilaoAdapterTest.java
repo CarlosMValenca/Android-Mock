@@ -58,6 +58,7 @@ public class ListaLeilaoAdapterTest {
         )));
         int quantidadeLeiloesDevolvida = adapter.getItemCount();
 
+        Mockito.verify(adapter).atualizaLista();
         assertThat(quantidadeLeiloesDevolvida, is(2));
     }
 
