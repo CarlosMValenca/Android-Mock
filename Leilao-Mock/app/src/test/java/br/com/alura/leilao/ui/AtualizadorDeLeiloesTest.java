@@ -35,6 +35,8 @@ public class AtualizadorDeLeiloesTest {
     private LeilaoWebClient client;
     @Mock
     private Context context;
+    @Mock
+    private AtualizadorDeLeiloes.ErroCarregaLeiloesListener listener;
 
     @Test
     public void deve_AtualizerListaDeLeiloes_QuandoBuscarLeiloesDaApi() {
@@ -51,7 +53,7 @@ public class AtualizadorDeLeiloesTest {
             }
         }).when(client).todos(any(RespostaListener.class));
 
-        atualizador.buscaLeiloes(adapter, client, context);
+        atualizador.buscaLeiloes(adapter, client, listener);
 
         verify(client).todos(any(RespostaListener.class));
         verify(adapter).atualiza(new ArrayList<>(Arrays.asList(
@@ -62,8 +64,7 @@ public class AtualizadorDeLeiloesTest {
 
     @Test
     public void deve_ParesentarMensagemDeFalha_QuandoFalharABuscaDeLeiloes(){
-        AtualizadorDeLeiloes atualizador = Mockito.spy(new AtualizadorDeLeiloes());
-        doNothing().when(atualizador).mostraMensagemDeFalha(context);
+        AtualizadorDeLeiloes atualizador = new AtualizadorDeLeiloes();
         doAnswer(new Answer() {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
@@ -73,9 +74,9 @@ public class AtualizadorDeLeiloesTest {
             }
         }).when(client).todos(any(RespostaListener.class));
 
-        atualizador.buscaLeiloes(adapter, client, context);
+        atualizador.buscaLeiloes(adapter, client, listener);
 
-        verify(atualizador).mostraMensagemDeFalha(context);
+        verify(listener).erroAoCarregar(anyString());
     }
 
 }
