@@ -2,6 +2,8 @@ package br.com.alura.leilao.ui.activity;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.verify;
 
 import android.content.Context;
 
@@ -28,19 +30,16 @@ import br.com.alura.leilao.ui.recyclerview.adapter.ListaLeilaoAdapter;
 public class ListaLeilaoActivityTest {
 
     @Mock
-    private Context context;
-    @Spy
-    private ListaLeilaoAdapter adapter = new ListaLeilaoAdapter(context);
+    private ListaLeilaoAdapter adapter;
     @Mock
     private LeilaoWebClient client;
 
     @Test
-    public void deve_AtualizerListaDeLeiloes_QuandoBuscarLeiloesDaApi() throws InterruptedException {
+    public void deve_AtualizerListaDeLeiloes_QuandoBuscarLeiloesDaApi(){
         ListaLeilaoActivity activity = new ListaLeilaoActivity();
-        Mockito.doNothing().when(adapter).atualizaLista();
-        Mockito.doAnswer(new Answer() {
+        doAnswer(new Answer() {
             @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
+            public Object answer(InvocationOnMock invocation){
                 RespostaListener<List<Leilao>> argument = invocation.getArgument(0);
                 argument.sucesso(new ArrayList<>(Arrays.asList(
                         new Leilao("Computador"),
@@ -51,10 +50,12 @@ public class ListaLeilaoActivityTest {
         }).when(client).todos(ArgumentMatchers.any(RespostaListener.class));
 
         activity.buscaLeiloes(adapter, client);
-        Thread.sleep(2000);
-        int quantidadeDeLeiloesDevolvida = adapter.getItemCount();
 
-        assertThat(quantidadeDeLeiloesDevolvida, is(2));
+        verify(client).todos(ArgumentMatchers.any(RespostaListener.class));
+        verify(adapter).atualiza(new ArrayList<>(Arrays.asList(
+                new Leilao("Computador"),
+                new Leilao("Carro")
+        )));
     }
 
 }
